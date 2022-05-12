@@ -1,59 +1,59 @@
 <script setup lang="ts">
-import { useUserStore } from '~/stores/user'
 
-const user = useUserStore()
-const name = $ref(user.savedName)
-
-const router = useRouter()
-const go = () => {
-  if (name)
-    router.push(`/hi/${encodeURIComponent(name)}`)
+interface BlockState{
+  x: number,
+  y: number,
+  revealed?: boolean,
+  mine?: boolean,
+  flagged?: boolean,
+  adjacentMines?: number
 }
 
-const { t } = useI18n()
+const WIDTH = 10
+const HEIGHT = 10
+const state = reactive(
+  Array.from({ length: HEIGHT },(_,y) => 
+    Array.from({ length: WIDTH },
+    (_,x): BlockState => ({
+      x,y
+    }) ,
+    ),
+  ),
+)
+
+function generateMines(){
+  for(const row of state){
+    for(const block of row)
+      block.mine  = Math.random() < 0.3
+  }
+}
+
+function onClick(x:number,y:number){
+  console.log(`Clicked at ${x},${y}`);
+}
+
+generateMines()
 </script>
 
 <template>
   <div>
-    <div text-4xl>
-      <div i-carbon-campsite inline-block />
-    </div>
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse" target="_blank">
-        Vitesse
-      </a>
-    </p>
-    <p>
-      <em text-sm opacity-75>{{ t('intro.desc') }}</em>
-    </p>
+    Minesweeper
 
-    <div py-4 />
+    <div 
+      v-for="row,y in state" 
+      :key="y">
 
-    <input
-      id="input"
-      v-model="name"
-      :placeholder="t('intro.whats-your-name')"
-      :aria-label="t('intro.whats-your-name')"
-      type="text"
-      autocomplete="false"
-      p="x4 y2"
-      w="250px"
-      text="center"
-      bg="transparent"
-      border="~ rounded gray-200 dark:gray-700"
-      outline="none active:none"
-      @keydown.enter="go"
-    >
-    <label class="hidden" for="input">{{ t('intro.whats-your-name') }}</label>
-
-    <div>
-      <button
-        btn m-3 text-sm
-        :disabled="!name"
-        @click="go"
+      <button 
+        v-for="item,x in row" 
+        :key="x" 
+        w-10 h-10 
+        hover:bg-gray
+        border
+        @click="onClick(x,y)"
       >
-        {{ t('button.go') }}
+        {{ item.mine ? 'x' : item.adjacentMines || '.' }}
       </button>
+
     </div>
   </div>
 </template>
