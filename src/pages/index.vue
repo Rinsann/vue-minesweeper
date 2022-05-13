@@ -3,7 +3,7 @@
 interface BlockState{
   x: number,
   y: number,
-  revealed?: boolean,
+  revealed: boolean,
   mine?: boolean,
   flagged?: boolean,
   adjacentMines?: number
@@ -17,7 +17,8 @@ const state = reactive(
     (_,x): BlockState => ({
       x,
       y,
-      adjacentMines:0
+      adjacentMines:0,
+      revealed: false
     }) ,
     ),
   ),
@@ -39,6 +40,18 @@ const directions = [
   [-1,0],
   [-1,1],
   [0,1],
+]
+
+const numberColors = [
+  'text-transparent',
+  'text-blue-500',
+  'text-green-500',
+  'text-yellow-500',
+  'text-orange-500',
+  'text-red-500',
+  'text-purple-500',
+  'text-pink-500',
+  'text-teal-500',
 ]
 
 function updateNumbers () {
@@ -64,7 +77,9 @@ function onClick(x:number,y:number){
 }
 
 function getBlockClass(block:BlockState){
-  return block.mine ? 'text-red' : 'text-gray'
+  return block.mine ? 
+  'bg-red-500/50' 
+  : numberColors[block.adjacentMines]
 }
 
 generateMines()
@@ -75,6 +90,8 @@ updateNumbers()
   <div>
     Minesweeper
 
+    <div p5>
+
     <div 
       v-for="row,y in state" 
       :key="y"
@@ -82,25 +99,26 @@ updateNumbers()
       items-center justify-center
       >
 
-      <button 
-        v-for="item,x in row" 
-        :key="x"
-        flex="~"
-        items-center justify-center
-        w-10 h-10 
-        hover:bg-gray
-        border
-        :class="getBlockClass(item)"
-        @click="onClick(x,y)"
-      >
-        <div v-if="item.mine" i-mdi:mine>
-          x
-        </div>
-        <div v-else>
-          {{ item.adjacentMines }}
-        </div>
-      </button>
-
+    <button 
+    v-for="item,x in row" :key="x"
+      flex="~"
+      items-center justify-center
+      w-10 h-10 m="0.5"
+      hover="bg-gray/10"
+      border="1 gray-400/10"
+      :class="getBlockClass(item)"
+      @click="onClick(x,y)"
+    >
+      <div v-if="item.mine" i-mdi:mine>
+        x
+      </div>
+      <div v-else>
+        {{ item.adjacentMines }}
+      </div>
+    </button>
+      
     </div>
+  </div>
+
   </div>
 </template>
