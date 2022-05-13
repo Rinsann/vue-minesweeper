@@ -15,7 +15,9 @@ const state = reactive(
   Array.from({ length: HEIGHT },(_,y) => 
     Array.from({ length: WIDTH },
     (_,x): BlockState => ({
-      x,y
+      x,
+      y,
+      adjacentMines:0
     }) ,
     ),
   ),
@@ -28,11 +30,45 @@ function generateMines(){
   }
 }
 
+const directions = [
+  [1,1],
+  [1,0],
+  [1,-1],
+  [0,-1],
+  [-1,-1],
+  [-1,0],
+  [-1,1],
+  [0,1],
+]
+
+function updateNumbers () {
+  state.forEach((raw,y)=>{
+    raw.forEach((block,x)=>{
+      if(block.mine)
+        return
+      directions.forEach(([dx,dy])=>{
+        const x2 = x + dx
+        const y2 = y + dy
+        if(x2 < 0 || x2 >= WIDTH || y2 < 0 || y2 >= HEIGHT)
+          return
+        
+        if(state[y2][x2].mine)
+          block.adjacentMines += 1
+      })
+    })
+  })
+}
+
 function onClick(x:number,y:number){
   console.log(`Clicked at ${x},${y}`);
 }
 
+function getBlockClass(block:BlockState){
+  return block.mine ? 'text-red' : 'text-gray'
+}
+
 generateMines()
+updateNumbers()
 </script>
 
 <template>
@@ -41,24 +77,30 @@ generateMines()
 
     <div 
       v-for="row,y in state" 
-      :key="y">
+      :key="y"
+      flex="~"
+      items-center justify-center
+      >
 
       <button 
         v-for="item,x in row" 
-        :key="x" 
+        :key="x"
+        flex="~"
+        items-center justify-center
         w-10 h-10 
         hover:bg-gray
         border
+        :class="getBlockClass(item)"
         @click="onClick(x,y)"
       >
-        {{ item.mine ? 'x' : item.adjacentMines || '.' }}
+        <div v-if="item.mine" i-mdi:mine>
+          x
+        </div>
+        <div v-else>
+          {{ item.adjacentMines }}
+        </div>
       </button>
 
     </div>
   </div>
 </template>
-
-<route lang="yaml">
-meta:
-  layout: home
-</route>

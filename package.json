@@ -5,6 +5,7 @@
     "build": "vite-ssg build",
     "dev": "vite --port 3333 --open",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "preview-https": "serve dist",
     "test": "vitest",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.23.0",
     "@iconify-json/carbon": "^1.1.4",
+    "@iconify-json/mdi": "^1.1.12",
     "@intlify/vite-plugin-vue-i18n": "^4.0.0",
     "@types/markdown-it-link-attributes": "^3.0.1",
     "@types/nprogress": "^0.2.0",
